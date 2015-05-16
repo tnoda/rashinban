@@ -4,7 +4,7 @@ A Clojure library designed to work with R.
 
 ## Usage
 
-FIXME
+![Screenshot](https://pbs.twimg.com/media/CFII67FVAAAviOp.png)
 
 ## License
 
