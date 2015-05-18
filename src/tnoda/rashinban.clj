@@ -29,7 +29,7 @@
          (clj/keep #(clj/re-find #"^[a-z]\S+" %))
          load-functions)))
 
-(defn start
+(defn init
   []
   (core/start)
   (load-functions (core/eval "builtins()"))
