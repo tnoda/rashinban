@@ -37,5 +37,3 @@
                        (clj/keep (clj/comp clj/second
                                            #(clj/re-find #"^package:(.+)" %))))]
     (load-library lib)))
-
-(start)
