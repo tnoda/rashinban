@@ -7,7 +7,7 @@
 
 (defn- load-functions
   [rfns]
-  (clj/doseq [rfn (clj/filter #(clj/re-find #"^[a-z]\S+" %) rfns)]
+  (clj/doseq [rfn (clj/filter #(clj/re-find #"^[a-z]\S*" %) rfns)]
     (clj/intern 'tnoda.rashinban
                 (clj/symbol (str/replace rfn \. \-))
                 (clj/fn [& more] (core/apply rfn more)))))
@@ -26,7 +26,7 @@
     (->> index-path
          io/reader
          clj/line-seq
-         (clj/keep #(clj/re-find #"^[a-z]\S+" %))
+         (clj/keep #(clj/re-find #"^[a-z]\S*" %))
          load-functions)))
 
 (defn init
