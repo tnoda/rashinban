@@ -35,6 +35,8 @@
   (->clj [rxs] (-> rxs .asList ->clj))
   REXPInteger
   (->clj [ris] (-> ris .asIntegers vec))
+  REXPLogical
+  (->clj [rls] (->> rls .asBytes (map pos?) vec))
   REXPNull
   (->clj [_] nil)
   REXPString
@@ -64,6 +66,8 @@
   (->r [coll] (->r (seq coll)))
   clojure.lang.Symbol
   (->r [x] (->r (str x)))
+  java.lang.Boolean
+  (->r [x] (if x "TRUE" "FALSE"))
   java.lang.Long
   (->r [x] (str x))
   java.lang.Double
