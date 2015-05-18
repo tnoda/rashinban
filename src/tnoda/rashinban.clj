@@ -31,7 +31,7 @@
 
 (defn init
   []
-  (core/start)
+  (core/connect)
   (load-functions (core/eval "builtins()"))
   (clj/doseq [lib (->> (core/apply 'search)
                        (clj/keep (clj/comp clj/second

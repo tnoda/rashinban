@@ -6,15 +6,16 @@
                                REXPDouble
                                REXPGenericVector
                                REXPInteger
+                               REXPLogical
                                REXPNull
                                REXPString
                                RList)))
 
-(defonce server (atom nil))
+(defonce connection (atom nil))
 
-(defn start
+(defn connect
   []
-  (swap! server (fn
+  (swap! connection (fn
                   [^RConnection conn]
                   (if (and conn (.isConnected conn))
                     conn
@@ -22,7 +23,7 @@
 
 (defn shutdown
   []
-  (swap! server #(.shutdown ^RConnection %)))
+  (swap! connection #(.shutdown ^RConnection %)))
 
 (defprotocol Rexp
   (->clj [x] "Convert an REngine objects into a Clojure value."))
@@ -72,10 +73,10 @@
 
 (defn eval
   [src]
-  (if @server
-    (->clj (.eval ^RConnection @server src))
+  (if @connection
+    (->clj (.eval ^RConnection @connection src))
     (throw (ex-info "Rserve connection has not been established."
-                    {:server @server
+                    {:connection @connection
                      :src src}))))
 
 
