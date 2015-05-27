@@ -1,4 +1,4 @@
-# tnoda.rashinban
+# Rashinban
 
 A Clojure library designed to work with R.
 
