@@ -26,7 +26,8 @@
   (swap! connection #(.shutdown ^RConnection %)))
 
 (defprotocol Rexp
-  (->clj [x] "Convert an REngine objects into a Clojure value."))
+  "Protocol for REngine objects that can be turned into Clojure values"
+  (->clj [x] "Transformes REngine objects into Clojure values."))
 
 (extend-protocol Rexp
   REXPDouble
@@ -65,7 +66,7 @@
   clojure.lang.PersistentVector
   (->r [coll] (->r (seq coll)))
   clojure.lang.Symbol
-  (->r [x] (->r (str x)))
+  (->r [x] (name x))
   java.lang.Boolean
   (->r [x] (if x "TRUE" "FALSE"))
   java.lang.Long
