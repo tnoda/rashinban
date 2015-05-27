@@ -5,35 +5,26 @@
             [clojure.java.io :as io]
             [tnoda.rashinban.core :as core]))
 
-(defn- load-functions
-  [rfns]
-  (clj/doseq [rfn (clj/filter #(clj/re-find #"^[a-z]\S*" %) rfns)]
+(defn- create-rfn
+  [rname]
+  (clj/println rname)
+  (clj/if-let [cljname (clj/re-find #"^[0-9a-zA-Z*+!_?-]+$"
+                                    (str/replace rname \. \-))]
     (clj/intern 'tnoda.rashinban
-                (clj/symbol (str/replace rfn \. \-))
-                (clj/fn [& more] (core/apply rfn more)))))
+                (clj/symbol cljname)
+                (clj/fn [& more] (core/apply rname more)))))
 
-(defn- library-index-path
-  [lib]
-  (-> (core/apply 'library [{:help lib}])
-      :path
-      clj/first
-      (clj/str "/INDEX")))
-
-(defn- load-library
-  [lib]
-  (clj/let [index-path (library-index-path lib)]
-    (core/apply 'library [lib])
-    (->> index-path
-         io/reader
-         clj/line-seq
-         (clj/keep #(clj/re-find #"^[a-z]\S*" %))
-         load-functions)))
+(defn- load-package-fns
+  [pkg]
+  (clj/doseq [rname (core/eval (clj/str "ls(getNamespace(\"" pkg "\"))"))]
+    (create-rfn rname)))
 
 (defn init
   []
   (core/connect)
-  (load-functions (core/eval "builtins()"))
-  (clj/doseq [lib (->> (core/apply 'search)
+  (clj/doseq [bfn (core/eval "builtins()")]
+    (create-rfn bfn))
+  (clj/doseq [pkg (->> (core/apply 'search)
                        (clj/keep (clj/comp clj/second
                                            #(clj/re-find #"^package:(.+)" %))))]
-    (load-library lib)))
+    (load-package-fns pkg)))
