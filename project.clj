@@ -7,7 +7,5 @@
                  [org.rosuda.REngine/Rserve "1.8.1"]
                  [org.rosuda.REngine/REngine "2.1.0"]
                  [incanter "1.5.6"
-                  :exclusions [org.clojure/clojure]]
-                 [clatrix "0.4.0"
                   :exclusions [org.clojure/clojure]]]
   :profiles {:dev {:dependencies [[org.clojure/test.check "0.7.0"]]}})
