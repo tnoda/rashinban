@@ -1,7 +1,6 @@
 (ns tnoda.rashinban.core
   (:refer-clojure :exclude [apply eval])
-  (:require [clojure.string :as str]
-            [incanter.core :as i])
+  (:require [clojure.string :as str])
   (:import (org.rosuda.REngine.Rserve RConnection)
            (org.rosuda.REngine REXP
                                REXPDouble
@@ -58,24 +57,6 @@
   nil
   (->val-with-meta [_] nil))
 
-(defmulti promote-vector
-  (fn
-    [v]
-    (->> v meta keys (some #{:dim}))))
-
-(defmethod promote-vector :dim [v]
-  (let [ncol (-> v meta :dim second)]
-    (i/matrix v ncol)))
-
-(defmethod promote-vector :default [v] v)
-
-(defprotocol ValueWithMetadata
-  "Protocol for Clojure objects that can be turned into a Clojure data structure"
-  (->clj [v] "Transform a Clojure value with metadata into a Clojure data structure"))
-
-(extend-protocol ValueWithMetadata
-  clojure.lang.PersistentVector
-  (->clj [v] (promote-vector v)))
 
 
 (defn- attr
