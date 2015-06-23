@@ -8,4 +8,4 @@
             [tnoda.rashinban.core :as rc]))
 
 (deftest test-eval-without-parse
-  (is (= 3.0 (.asDouble (rc/apply 'r/c [1 2])))))
+  (is (= [3.0] (.asDoubles (rc/apply 'r/c [1 2])))))
