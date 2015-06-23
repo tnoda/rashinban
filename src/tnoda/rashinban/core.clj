@@ -1,6 +1,7 @@
 (ns tnoda.rashinban.core
   (:refer-clojure :exclude [apply eval])
-  (:require [clojure.string :as str])
+  (:require [clojure.string :as str]
+            [incanter.core :as i])
   (:import (org.rosuda.REngine.Rserve RConnection)
            (org.rosuda.REngine REXP
                                REXPDouble
@@ -27,35 +28,64 @@
 
 (defprotocol Rexp
   "Protocol for REngine objects that can be turned into Clojure values"
-  (->clj [x] "Transformes REngine objects into Clojure values."))
+  (->val-with-meta [x] "Transformes an REngine object into Clojure value with metadata."))
 
 (extend-protocol Rexp
   REXPDouble
-  (->clj [rds] (-> rds .asDoubles vec))
+  (->val-with-meta [rds] (-> rds .asDoubles vec))
   REXPGenericVector
-  (->clj [rxs] (-> rxs .asList ->clj))
+  (->val-with-meta [rxs] (-> rxs .asList ->val-with-meta))
   REXPInteger
-  (->clj [ris] (-> ris .asIntegers vec))
+  (->val-with-meta [ris] (-> ris .asIntegers vec))
   REXPLogical
-  (->clj [rls] (->> rls .asBytes (map pos?) vec))
+  (->val-with-meta [rls] (->> rls .asBytes (map pos?) vec))
   REXPNull
-  (->clj [_] nil)
+  (->val-with-meta [_] nil)
   REXPString
-  (->clj [rfs] (-> rfs .asStrings vec))
+  (->val-with-meta [rfs] (-> rfs .asStrings vec))
   REXP
-  (->clj [rexp] (str rexp))
+  (->val-with-meta [rexp] (str rexp))
   RList
-  (->clj [rxs] (reduce (fn
+  (->val-with-meta [rxs] (reduce (fn
                          [acc k]
                          (assoc acc
                                 (keyword k)
                                 (->> (str k)
                                      (.at rxs)
-                                     ->clj)))
+                                     ->val-with-meta)))
                        {}
                        (.keys rxs)))
   nil
-  (->clj [_] nil))
+  (->val-with-meta [_] nil))
+
+(defmulti promote-vector
+  (fn
+    [v]
+    (->> v meta keys (some #{:dim}))))
+
+(defmethod promote-vector :dim [v]
+  (let [ncol (-> v meta :dim second)]
+    (i/matrix v ncol)))
+
+(defmethod promote-vector :default [v] v)
+
+(defprotocol ValueWithMetadata
+  "Protocol for Clojure objects that can be turned into a Clojure data structure"
+  (->clj [v] "Transform a Clojure value with metadata into a Clojure data structure"))
+
+(extend-protocol ValueWithMetadata
+  clojure.lang.PersistentVector
+  (->clj [v] (promote-vector v)))
+
+
+(defn- attr
+  [^REXP r]
+  (some-> r ._attr .asList ->val-with-meta))
+
+
+(defn r->clj
+  [r]
+  (with-meta (->val-with-meta r) (attr r)))
 
 (defprotocol RData
   (->r [x] "Convert a Clojure value into an REngine objects"))
@@ -79,7 +109,7 @@
 (defn eval
   [src]
   (if @connection
-    (->clj (.eval ^RConnection @connection src))
+    (r->clj (.eval ^RConnection @connection src))
     (throw (ex-info "Rserve connection has not been established."
                     {:connection @connection
                      :src src}))))
