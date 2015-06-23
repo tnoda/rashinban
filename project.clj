@@ -5,5 +5,6 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.rosuda.REngine/Rserve "1.8.1"]
-                 [org.rosuda.REngine/REngine "2.1.0"]]
+                 [org.rosuda.REngine/REngine "2.1.0"]
+                 [net.mikera/core.matrix "0.36.1"]]
   :profiles {:dev {:dependencies [[org.clojure/test.check "0.7.0"]]}})
