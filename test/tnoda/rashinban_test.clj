@@ -4,20 +4,8 @@
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
             [clojure.test.check.clojure-test :refer [defspec]]
-            [tnoda.rashinban :as r]))
+            [tnoda.rashinban :as r]
+            [tnoda.rashinban.core :as rc]))
 
-(defspec a-number-array-is-converted-into-an-array-of-doubles
-  100
-  (prop/for-all [xs (gen/vector gen/int)]
-    (= (seq (map double xs)) (apply r/c xs))))
-
-(defspec boolean-values-support
-  100
-  (prop/for-all [bs (gen/vector gen/boolean)]
-    (= (seq bs) (apply r/c bs))))
-
-(defspec string-values-support
-  100
-  (prop/for-all [ss (gen/vector gen/string-alphanumeric)]
-    (= (seq ss) (apply r/c ss))))
-
+(deftest test-eval-without-parse
+  (is (= 3.0 (.asDouble (rc/apply 'r/c [1 2])))))
