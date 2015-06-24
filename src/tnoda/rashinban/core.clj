@@ -96,7 +96,7 @@
                      :src src}))))
 
 
-(defn apply
+(defn apply2
   ([rfn more]
    (let [optionize (fn
                      [m]

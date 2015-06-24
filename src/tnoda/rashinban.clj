@@ -12,7 +12,7 @@
                                     (str/replace rname \. \-))]
     (clj/intern 'tnoda.rashinban
                 (clj/symbol cljname)
-                (clj/fn [& more] (core/apply rname more)))))
+                (clj/fn [& more] (core/apply2 rname more)))))
 
 (defn- load-package-fns
   [pkg]
@@ -24,7 +24,7 @@
   (core/connect)
   (clj/doseq [bfn (core/eval "builtins()")]
     (create-rfn bfn))
-  (clj/doseq [pkg (->> (core/apply 'search)
+  (clj/doseq [pkg (->> (core/apply2 'search)
                        (clj/keep (clj/comp clj/second
                                            #(clj/re-find #"^package:(.+)" %))))]
     (load-package-fns pkg)))
