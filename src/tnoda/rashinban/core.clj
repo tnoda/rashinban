@@ -23,3 +23,9 @@
 (defn shutdown
   []
   (swap! connection #(.shutdown ^RConnection %)))
+
+(defn apply
+  [& args]
+  (throw (ex-info "undefined"
+                  {:connection @connection
+                   :args args})))
