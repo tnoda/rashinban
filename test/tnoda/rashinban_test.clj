@@ -8,5 +8,10 @@
             [tnoda.rashinban.core :as core])
   (:import (org.rosuda.REngine REXPDouble)))
 
+(deftest test-eval
+  (is (= [3.0]
+         (vec (.asDoubles (core/eval "1 + 2"))))))
+
 (deftest test-core-apply-function
-  (is (= [3.0] (.asDoubles ^REXPDouble (core/apply 'c [1 2])))))
+  (is (= [3.0]
+         (vec (.asDoubles ^REXPDouble (core/apply 'c [1 2]))))))

@@ -20,9 +20,19 @@
                         conn
                         (RConnection.)))))
 
+(defn- get-conn ^RConnection
+  []
+  (or @connection
+      (throw (ex-info "Rserve connection has not been established."
+                      {:connection @connection}))))
+
 (defn shutdown
   []
   (swap! connection #(.shutdown ^RConnection %)))
+
+(defn eval
+  [src]
+  (.eval (get-conn) src))
 
 (defn apply
   [& args]
