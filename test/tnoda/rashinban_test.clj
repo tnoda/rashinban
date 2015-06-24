@@ -9,4 +9,4 @@
   (:import (org.rosuda.REngine REXPDouble)))
 
 (deftest test-eval-without-parse
-  (is (= [3.0] (.asDoubles ^REXPDouble (rc/apply 'r/c [1 2])))))
+  (is (= [3.0] (.asDoubles ^REXPDouble (rc/apply 'c [1 2])))))
