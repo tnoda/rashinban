@@ -1,5 +1,7 @@
 (ns tnoda.rashinban.core
   (:refer-clojure :exclude [apply eval])
+  (:require [clojure.core :as clj]
+            [tnoda.rashinban.protocols :refer [->rexp ->clj]])
   (:import (org.rosuda.REngine.Rserve RConnection)
            (org.rosuda.REngine REXP
                                REXPDouble
@@ -8,6 +10,7 @@
                                REXPLogical
                                REXPNull
                                REXPString
+                               REXPSymbol
                                RList)))
 
 (defonce connection (atom nil))
@@ -32,10 +35,17 @@
 
 (defn eval
   [src]
-  (.eval (get-conn) src))
+  (-> (get-conn)
+      (.eval src)
+      ->clj))
 
 (defn apply
-  [& args]
-  (throw (ex-info "undefined"
-                  {:connection @connection
-                   :args args})))
+  [^String rfn & more]
+  (let [args (->> (clj/apply list* more)
+                  (map ->rexp)
+                  (into-array REXP))
+        what (REXP/asCall rfn args)]
+    (-> (get-conn)
+        (.eval what nil true)
+        ->clj)))
+
