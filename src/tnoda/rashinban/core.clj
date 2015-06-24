@@ -1,7 +1,7 @@
 (ns tnoda.rashinban.core
   (:refer-clojure :exclude [apply eval])
   (:require [clojure.core :as clj]
-            [tnoda.rashinban.protocols :refer [->rexp ->clj]])
+            [tnoda.rashinban.protocols :refer [clj->rexp java->clj]])
   (:import (org.rosuda.REngine.Rserve RConnection)
            (org.rosuda.REngine REXP
                                REXPDouble
@@ -33,19 +33,24 @@
   []
   (swap! connection #(.shutdown ^RConnection %)))
 
+(defn eval*
+  [^String src]
+  (-> (get-conn) (.eval src) .asNativeJavaObject))
+
 (defn eval
   [src]
-  (-> (get-conn)
-      (.eval src)
-      ->clj))
+  (java->clj (eval* src)))
 
-(defn apply
+(defn apply*
   [^String rfn & more]
   (let [args (->> (clj/apply list* more)
-                  (map ->rexp)
+                  (map clj->rexp)
                   (into-array REXP))
         what (REXP/asCall rfn args)]
     (-> (get-conn)
         (.eval what nil true)
-        ->clj)))
+        .asNativeJavaObject)))
 
+(defn apply
+  [& args]
+  (java->clj (clj/apply apply* args)))
