@@ -1,4 +1,4 @@
-(defproject org.clojars.tnoda/rashinban "0.0.50"
+(defproject org.clojars.tnoda/rashinban "0.0.150"
   :description "A Clojure library to work with R"
   :url "https://github.com/tnoda/rashinban"
   :license {:name "Eclipse Public License"

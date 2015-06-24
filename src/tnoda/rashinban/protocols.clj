@@ -1,12 +1,14 @@
 (ns tnoda.rashinban.protocols
-  (:import (org.rosuda.REngine REXPDouble
+  (:import (org.rosuda.REngine REXP
+                               REXPDouble
+                               REXPGenericVector
                                REXPInteger
                                REXPLogical
                                REXPNull
                                REXPString)))
 
-(defprotocol ToREXP
-  (->rexp [x] "Protocol to convert a Clojure value into an REngine object"))
+(defprotocol CljToREXP
+  (clj->rexp [x] "Protocol to convert a Clojure value into an REngine object"))
 
 (defn- seq->rexp
   [s]
@@ -27,27 +29,27 @@
            (into-array String)
            REXPString.))))
 
-(extend-protocol ToREXP
+(extend-protocol CljToREXP
   nil
-  (->rexp [x] (REXPNull.))
+  (clj->rexp [x] (REXPNull.))
 
   Boolean
-  (->rexp [x] (REXPLogical. x))
+  (clj->rexp [x] (REXPLogical. x))
 
   String
-  (->rexp [x] (REXPString. x))
+  (clj->rexp [x] (REXPString. x))
 
   clojure.lang.Seqable
-  (->rexp [x] (-> x seq seq->rexp))
+  (clj->rexp [x] (-> x seq seq->rexp))
 
   Iterable
-  (->rexp [x] (-> x seq seq->rexp))
+  (clj->rexp [x] (-> x seq seq->rexp))
 
   CharSequence
-  (->rexp [x] (-> x seq seq->rexp))
+  (clj->rexp [x] (-> x seq seq->rexp))
 
   Object
-  (->rexp [x] (cond
+  (clj->rexp [x] (cond
                 (number? x)
                 (REXPDouble. (double x))
 
@@ -57,21 +59,47 @@
                 :default
                 (REXPString. (str x)))))
 
-(defprotocol ToClj
-  (->clj [x] "Protocol to convert an REngine object into a Clojure value"))
+(defprotocol JavaToClj
+  (java->clj [x] "Protocol to convert native Java objects of REngine to Clojure values"))
 
-(extend-protocol ToClj
-  REXPDouble
-  (->clj [x] (-> x .asDoubles vec))
+;;; double
+(extend-protocol JavaToClj
+  (Class/forName "[D")
+  (java->clj [x]
+    (vec x)))
 
-  REXPInteger
-  (->clj [x] (-> x .asIntegers vec))
+;;; integer
+(extend-protocol JavaToClj
+  (Class/forName "[I")
+  (java->clj [x]
+    (vec x)))
 
-  REXPLogical
-  (->clj [x] (mapv #(= % REXPLogical/TRUE) (.asBytes x)))
+;;; boolesn
+(extend-protocol JavaToClj
+  (Class/forName "[B")
+  (java->clj [x]
+    (mapv #(= % REXPLogical/TRUE) x)))
 
-  REXPString
-  (->clj [x] (-> x .asStrings vec))
+(extend-protocol JavaToClj
+  (Class/forName "[Ljava.lang.String;")
+  (java->clj [x]
+    (vec x)))
 
-  REXPNull
-  (->clj [_] nil))
+;;; Generic vectors
+(extend-protocol JavaToClj
+  java.util.Map
+  (java->clj [x]
+    (into {} x))
+  java.util.List
+  (java->clj [x]
+    (mapv java->clj x)))
+
+;;; Default
+(extend-protocol JavaToClj
+  nil
+  (java->clj [_]
+    nil)
+
+  Object
+  (java->clj [x]
+    x))
