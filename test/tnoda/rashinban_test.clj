@@ -5,7 +5,7 @@
             [clojure.test.check.properties :as prop]
             [clojure.test.check.clojure-test :refer [defspec]]
             [tnoda.rashinban :as r]
-            [tnoda.rashinban.core :as rc])
+            [tnoda.rashinban.core :as core])
   (:import (org.rosuda.REngine REXPDouble)))
 
 (deftest test-eval-without-parse
