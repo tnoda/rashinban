@@ -16,12 +16,13 @@
 (defonce connection (atom nil))
 
 (defn connect
-  []
-  (swap! connection (fn
-                      [^RConnection conn]
-                      (if (and conn (.isConnected conn))
-                        conn
-                        (RConnection.)))))
+  ([]
+   (reset! connection (RConnection.)))
+  ([^String host]
+   (reset! connection (RConnection. host)))
+  ([^String host port]
+   (reset! connection (RConnection. host (int port)))))
+
 
 (defn- get-conn ^RConnection
   []
@@ -31,7 +32,7 @@
 
 (defn shutdown
   []
-  (swap! connection #(.shutdown ^RConnection %)))
+  (swap! connection (memfn ^RConnection shutdown)))
 
 (defn eval*
   [^String src]
@@ -46,7 +47,7 @@
   (let [args (->> (clj/apply list* more)
                   (map clj->rexp)
                   (into-array REXP))
-        what (REXP/asCall rfn args)]
+        what (REXP/asCall rfn ^"[Lorg.rosuda.REngine.REXP;" args)]
     (-> (get-conn)
         (.eval what nil true)
         .asNativeJavaObject)))

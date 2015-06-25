@@ -5,7 +5,8 @@
                                REXPInteger
                                REXPLogical
                                REXPNull
-                               REXPString)))
+                               REXPString
+                               REXPSymbol)))
 
 (defprotocol CljToREXP
   (clj->rexp [x] "Protocol to convert a Clojure value into an REngine object"))
@@ -24,14 +25,14 @@
            REXPLogical.)
 
       :default
-      (->> s
-           (map str)
-           (into-array String)
-           REXPString.))))
+      (REXPString. ^"[Ljava.lang.String;" (into-array String (map str s))))))
 
 (extend-protocol CljToREXP
   nil
   (clj->rexp [x] (REXPNull.))
+
+  clojure.lang.Symbol
+  (clj->rexp [x] (REXPSymbol. (name x)))
 
   Boolean
   (clj->rexp [x] (REXPLogical. x))
@@ -57,7 +58,9 @@
                 (seq->rexp x)
 
                 :default
-                (REXPString. (str x)))))
+                (throw (IllegalArgumentException.
+                        (str "clj->rexp could not convert a Clojure value into a REXP object: "
+                             {:value x :class (class x) :type (type x)}))))))
 
 (defprotocol JavaToClj
   (java->clj [x] "Protocol to convert native Java objects of REngine to Clojure values"))
@@ -74,7 +77,7 @@
   (java->clj [x]
     (vec x)))
 
-;;; boolesn
+;;; boolean
 (extend-protocol JavaToClj
   (Class/forName "[B")
   (java->clj [x]
@@ -97,8 +100,7 @@
 ;;; Default
 (extend-protocol JavaToClj
   nil
-  (java->clj [_]
-    nil)
+  (java->clj [x])
 
   Object
   (java->clj [x]
