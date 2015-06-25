@@ -6,6 +6,10 @@ A Clojure library designed to work with R.
 
 ![Screenshot](https://pbs.twimg.com/media/CFII67FVAAAviOp.png)
 
+## TODOs
+
+https://github.com/tnoda/rashinban/wiki/Rashinban2Features
+
 ## License
 
 Copyright © 2015 Takahiro Noda
