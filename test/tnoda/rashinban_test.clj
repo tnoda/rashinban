@@ -44,3 +44,10 @@
         sym (gensym)]
     (core/apply "<-" [sym expected])
     (= expected (core/apply "as.vector" [sym]))))
+
+(deftest test-init
+  (r/init)
+  (let [xs [1.0 2.0 3.0]]
+    (is (= xs (r/<- 'x xs)))
+    (is (= [2.0] (r/mean 'x)))
+    (is (= [1.0] (r/var 'x)))))
