@@ -46,7 +46,7 @@
   (let [args (->> (clj/apply list* more)
                   (map clj->rexp)
                   (into-array REXP))
-        what (REXP/asCall rfn args)]
+        what (REXP/asCall rfn ^"[Lorg.rosuda.REngine.REXP;" args)]
     (-> (get-conn)
         (.eval what nil true)
         .asNativeJavaObject)))

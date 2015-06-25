@@ -25,10 +25,7 @@
            REXPLogical.)
 
       :default
-      (->> s
-           (map str)
-           (into-array String)
-           REXPString.))))
+      (REXPString. ^"[Ljava.lang.String;" (into-array String (map str s))))))
 
 (extend-protocol CljToREXP
   nil
