@@ -31,7 +31,7 @@
 
 (defn shutdown
   []
-  (swap! connection #(.shutdown ^RConnection %)))
+  (swap! connection (memfn ^RConnection shutdown)))
 
 (defn eval*
   [^String src]
