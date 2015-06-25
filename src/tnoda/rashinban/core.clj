@@ -1,6 +1,7 @@
 (ns tnoda.rashinban.core
   (:refer-clojure :exclude [apply eval])
   (:require [clojure.core :as clj]
+            [clojure.string :as str]
             [tnoda.rashinban.protocols :refer [clj->rexp java->clj]])
   (:import (org.rosuda.REngine.Rserve RConnection)
            (org.rosuda.REngine REXP
@@ -15,7 +16,7 @@
 
 (defonce connection (atom nil))
 
-(defn connect
+(defn- connect
   ([]
    (reset! connection (RConnection.)))
   ([^String host]
@@ -55,3 +56,28 @@
 (defn apply
   [& args]
   (java->clj (clj/apply apply* args)))
+
+(defn- rdefn
+  [rfn]
+  (let [clojurize #(symbol (str/replace % #"[./]" "-"))]
+    (intern 'tnoda.rashinban
+            (clojurize rfn)
+            #(apply rfn %&))))
+
+(defn- load-builtins
+  []
+  (doseq [rfn (apply "builtins" nil)]
+    (rdefn rfn)))
+
+(defn- load-attached-package-fns
+  []
+  (doseq [pkg (->> (eval "search()")
+                   (keep #(second (re-find #"^package:(.+)" %))))
+          rfn (eval (str "ls(getNamespace(\"" pkg "\"))"))]
+    (rdefn rfn)))
+
+(defn init
+  [& args]
+  (connect)
+  (load-builtins)
+  (load-attached-package-fns))
