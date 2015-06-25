@@ -5,7 +5,8 @@
                                REXPInteger
                                REXPLogical
                                REXPNull
-                               REXPString)))
+                               REXPString
+                               REXPSymbol)))
 
 (defprotocol CljToREXP
   (clj->rexp [x] "Protocol to convert a Clojure value into an REngine object"))
@@ -32,6 +33,9 @@
 (extend-protocol CljToREXP
   nil
   (clj->rexp [x] (REXPNull.))
+
+  clojure.lang.Symbol
+  (clj->rexp [x] (REXPSymbol. (name x)))
 
   Boolean
   (clj->rexp [x] (REXPLogical. x))

@@ -38,3 +38,9 @@
   100
   (prop/for-all [xs (gen/vector gen/string-ascii)]
     (= (seq xs) (core/apply "c" xs))))
+
+(deftest test-symbol
+  (let [expected [1 2 3]
+        sym (gensym)]
+    (core/apply "<-" [sym expected])
+    (= expected (core/apply "as.vector" [sym]))))
