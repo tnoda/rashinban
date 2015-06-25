@@ -74,7 +74,7 @@
   (java->clj [x]
     (vec x)))
 
-;;; boolesn
+;;; boolean
 (extend-protocol JavaToClj
   (Class/forName "[B")
   (java->clj [x]
