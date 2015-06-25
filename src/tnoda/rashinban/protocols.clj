@@ -57,7 +57,9 @@
                 (seq->rexp x)
 
                 :default
-                (REXPString. (str x)))))
+                (throw (IllegalArgumentException.
+                        (str "clj->rexp could not convert a Clojure value into a REXP object: "
+                             {:value x :class (class x) :type (type x)}))))))
 
 (defprotocol JavaToClj
   (java->clj [x] "Protocol to convert native Java objects of REngine to Clojure values"))
