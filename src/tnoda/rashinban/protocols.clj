@@ -99,8 +99,7 @@
 ;;; Default
 (extend-protocol JavaToClj
   nil
-  (java->clj [_]
-    nil)
+  (java->clj [x])
 
   Object
   (java->clj [x]
