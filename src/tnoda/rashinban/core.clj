@@ -16,12 +16,13 @@
 (defonce connection (atom nil))
 
 (defn connect
-  []
-  (swap! connection (fn
-                      [^RConnection conn]
-                      (if (and conn (.isConnected conn))
-                        conn
-                        (RConnection.)))))
+  ([]
+   (reset! connection (RConnection.)))
+  ([^String host]
+   (reset! connection (RConnection. host)))
+  ([^String host port]
+   (reset! connection (RConnection. host (int port)))))
+
 
 (defn- get-conn ^RConnection
   []
