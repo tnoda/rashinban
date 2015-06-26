@@ -1,5 +1,7 @@
 # Rashinban
 
+[![Clojars Project](http://clojars.org/org.clojars.tnoda/rashinban/latest-version.svg)](http://clojars.org/org.clojars.tnoda/rashinban)
+
 A Clojure library designed to work with R.
 
 ## Example
