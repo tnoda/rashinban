@@ -8,4 +8,5 @@
   functions of currently attached packages are loaded into the
    tnoda.rashinban namespace."
   [& args]
+  (clj/ns-unmap 'tnoda.rashinban 'Math)
   (clj/apply core/init args))
