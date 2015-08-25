@@ -56,7 +56,7 @@ Rashinban comes with a shell script to start a dedicated Rserve server. The shel
 
 ## Example
 
-![screenshot](https://tnoda.github.io/rashinban/figs/rashinban-example.png)
+![screenshot](https://tnoda.github.io/rashinban/figs/rashinban-example.jpg)
 
 
 ## Data type conversion
